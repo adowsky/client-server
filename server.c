@@ -131,7 +131,7 @@ int main(){
 void process_request(){
   if(msg.command_type < 0 || msg.command_type > 14){
     msg.command_type = -1;
-    msg.message = "Nieprawidłowa funkcja!";
+    strcpy(msg.message, "Nieprawidłowa funkcja!");
     return;
   }
   switch (msg.command_type) {
@@ -165,7 +165,7 @@ void process_request(){
   }
 }
 void commands(){
-  msg.message = "Dodatkowa funkcjonalność: update";
+  strcpy(msg.message, "Dodatkowa funkcjonalność: update");
 }
 int authenticate(){
   char* password = strdup(msg.message);
@@ -177,20 +177,20 @@ int authenticate(){
     if(strcmp(name, database[i].name) == 0 && strcmp(name, database[i].password) == 0){
       msg.user_id = i;
       if(database[i].type == 1)
-        msg.message = "pacjent";
+        strcpy(msg.message, "pacjent");
       else if(database[i].type == 2)
-        msg.message = "lekarz";
+        strcpy(msg.message, "lekarz");
       else if(database[i].type == 1){
-        msg.message = "rejestracja";
+        strcpy(msg.message, "rejestracja");
       }
       return 1;
     }
   }
-    msg.message = "autryzacja zakończona niepowodzeniem";
+    strcpy(msg.message, "autryzacja zakończona niepowodzeniem");
     return 0;
 }
 void whoami(){
-  msg.message = database[msg.user_id].name + " " + role[database[msg.user_id].type];
+  strcpy(msg.message, database[msg.user_id].name + " " + role[database[msg.user_id].type]);
 }
 void register(){
   char* dup = strdup(msg.message);
@@ -212,7 +212,7 @@ void details(){
     int i;
     for(i=0;i<usr_count;i++){
       if(strcmp(msg.message,database[i].name) == 0){
-        msg.message = database[i].name + " " + database[i].properties[0] + " " +database[i].properties[1] + " " +database[i].properties[2];
+        strcpy(msg.message, database[i].name + " " + database[i].properties[0] + " " +database[i].properties[1] + " " +database[i].properties[2]);
         return;
       }
     }
@@ -224,16 +224,16 @@ void details(){
     for(i=0;i<usr_count;i++){
       if(strcmp(name,database[i].name) == 0){
         if(strcmp(password,database[i].password) == 0){
-        msg.message = database[i].name + " " + database[i].properties[0] + " " +database[i].properties[1] + " " +database[i].properties[2];
+        strcpy(msg.message, database[i].name + " " + database[i].properties[0] + " " +database[i].properties[1] + " " +database[i].properties[2]);
         return;
       }else{
-        msg.message = "Niepopawne hasło!";
+        strcpy(msg.message, "Niepopawne hasło!");
         msg.command_type = -1;
       }
     }
   }
   }else{
-    msg.message = "Niewystarczające uprawnienia!";
+    strcpy(msg.message, "Niewystarczające uprawnienia!");
     msg.command_type = -1;
   }
 }
@@ -247,9 +247,9 @@ void delete(){
     }
   }
   if(done)
-    msg.message = "Usunieto pomyslnie";
+    strcpy(msg.message, "Usunieto pomyslnie");
   else
-    msg.message = "Nie znaleziono uzytkownika";
+    strcpy(msg.message, "Nie znaleziono uzytkownika");
 }
 void update(){
   char* dup = strdup(msg.message);
@@ -272,9 +272,9 @@ void update(){
     }
   }
   if(found)
-    msg.message = "Zaktualizowano pomyślnie!";
+    strcpy(msg.message, "Zaktualizowano pomyślnie!");
   else
-    msg.message = "Nie zaktualizowano";
+    strcpy(msg.message, "Nie zaktualizowano");
 }
 void list(){
   int i;
@@ -320,5 +320,5 @@ void list(){
 
 }
 void unsupported(){
-  msg.message = "Polecenie niewspierane";
+  strcpy(msg.message, "Polecenie niewspierane");
 }
