@@ -18,7 +18,7 @@ zaktualizować register o prześwietlanie tablicy jesli usr_count == 100;
 struct user{
   char name[60];
   char password[30];
-  char properties[4][60];
+  char properties[3][60];
   int type;
 };
 
@@ -92,10 +92,15 @@ void create_basic_users(){
   printf("Tworzenie podstawowych użytkowników...\n");
   strcpy(database[usr_count].name, "lekarz\0");
   database[usr_count].type = 2;
-  strcpy(database[usr_count++].password, "lek\0");
+  strcpy(database[usr_count].password, "lek\0");
+  printf("%d %ddone\n",usr_count,database[usr_count].type);
+  usr_count++;
+
   strcpy(database[usr_count].name, "rejestracja\0");
   database[usr_count].type = 3;
-  strcpy(database[usr_count++].password, "rej\0");
+  strcpy(database[usr_count].password, "rej\0");
+  printf("%d %ddone\n",usr_count,database[usr_count].type);
+  usr_count++;
 
 }
 int main(){
@@ -338,8 +343,9 @@ void update(){
     strcpy(msg->message, "Nie zaktualizowano");
 }
 void list(){
+  printf("%d\n",usr_count);
   int i;
-    int field;
+  int field;
   if(msg->is_complete == -1){ // czy jest to kontynuacja wysyłania
     i = tmp1;
     field = tmp2;
@@ -350,10 +356,10 @@ void list(){
   }
   strcpy(msg->message, "");
   int size = 0;
-
-  for(; i<usr_count; i++){
+  for(; i<usr_count; ){
     if(field == 0){
       int len = strlen(database[i].name);
+      printf("%d:%s ",i,database[i].name);
       if(size+len+1 >300){
         msg->is_complete = -1;
         tmp1 = i;
@@ -372,9 +378,11 @@ void list(){
         tmp2 = field;
       }else{
         strcat(msg->message, role[database[i].type]);
-        strcat(msg->message, ":");
+        printf("%s(%d)\n",role[database[i].type],database[i].type);
+        strcat(msg->message, " ");
         field = 0;
         size+=len+1;
+        i++;
       }
     }
 }
