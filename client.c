@@ -24,13 +24,23 @@ void process_respond();
 void copy_request();
 
 int read_input(int count, char* dir){
-  int i = 0;
+  if(count == 1){
+    *dir = getchar();
+    char ch;
+    while((ch = getchar())!='\n'  && ch != EOF  );
+    return 1;
+  }
   char ch;
   fgets(dir, count, stdin);
   if (strlen(dir) == count )
     while((ch = getchar())!='\n'  && ch != EOF  );
+  else
+    dir[strlen(dir)-1] = 0;
   }
-
+void flushin(){
+  char ch;
+  while((ch = getchar())!='\n'  && ch != EOF  );
+}
 void sigint_handler(int i){
   //finalization
   munmap(s_area, sizeof(message));
@@ -180,7 +190,8 @@ void request_details(int* cmd, int* auth){
       strcat(tmp.message,";");
       char conf;
       printf("Hasło? (t\\N) ");
-      scanf(" %c",&conf);
+      read_input(1,&conf);
+      printf("%c\n",conf);
       if(conf == 't'){
       printf("Podaj hasło: ");
       read_input(60,tab);
@@ -188,7 +199,7 @@ void request_details(int* cmd, int* auth){
       }
       strcat(tmp.message,";");
       printf("Wiek? (t\\N) ");
-      scanf(" %c",&conf);
+      read_input(1,&conf);
       if(conf == 't'){
       printf("Podaj wiek: ");
       read_input(60,tab);
@@ -196,7 +207,7 @@ void request_details(int* cmd, int* auth){
       }
       strcat(tmp.message,";");
       printf("Wstępne rozpoznanie? (t\\N) ");
-      scanf(" %c",&conf);
+      read_input(1,&conf);
       if(conf == 't'){
         char rozp[100];
         printf("Podaj rozpoznanie(max 100 zn.): ");
