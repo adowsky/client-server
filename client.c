@@ -8,6 +8,12 @@
 #include <semaphore.h>
 #include "message.h"
 
+/**
+@file
+@brief Plik klienta.
+*/
+
+/** \cond */
 typedef struct message message;
 
 message* msg;
@@ -17,12 +23,11 @@ long my_usr_id;
 char user_type[11];
 unsigned int* s_area;
 sem_t* sem_clients;
+/** \endcond */
 
-int make_request();
 void request_details(int* cmd, int* auth);
-void process_respond();
 void copy_request();
-
+/*! Czyta wejście wraz z białymi znakami do wystąpienia znaku nowej linii lub przepełnienia bufora. */
 int read_input(int count, char* dir){
   if(count == 1){
     *dir = getchar();
@@ -37,10 +42,16 @@ int read_input(int count, char* dir){
   else
     dir[strlen(dir)-1] = 0;
   }
+  /**
+  * Czyści bufor wejścia.
+  */
 void flushin(){
   char ch;
   while((ch = getchar())!='\n'  && ch != EOF  );
 }
+/**
+Zamyka otwarte zasoby i wyłącza klienta.
+*/
 void sigint_handler(int i){
   //finalization
   munmap(s_area, sizeof(message));
@@ -50,8 +61,9 @@ void sigint_handler(int i){
   printf("\nKlient zamknięty pomyślnie! \n");
   exit(0);
 }
-
-
+/**
+\cond
+*/
 int main(){
   printf("Ładowanie klienta...\n");
   signal(SIGINT, sigint_handler);
@@ -88,7 +100,7 @@ int main(){
   int auth = 0;
 
   while(1){
-    int make = make_request(auth);
+    int make = make_request(&auth);
     sem_wait(sem_clients);
     csem = 1;
     if(make == 0 ){
@@ -107,12 +119,14 @@ int main(){
   }
   return 0;
 }
+/** \endcond */
+
 /**
 * Tworzy żądanie, prosząc o odpowienie wpisy użytkownika.
 * Zwraca -1 jeśli nastąpił błąd lub 0 - jeśli proces przebiegł pomyślnie.
 */
 int make_request(int *auth){
-  if(!auth){  // autoryzuje do skutku
+  if(!*auth){  // autoryzuje do skutku
     char name[60], password[30];
     printf("Imię i nazwisko: ");
     char c;
@@ -134,15 +148,20 @@ int make_request(int *auth){
   cmd = parse_comand(tab);
   request_details(&cmd,auth);  // tworzymy żądanie
   if(cmd < 0 || cmd > 14){
-    printf("Wrong command!");
+    printf("Wrong command!\n");
     return -1;
   }
     tmp.command_type = cmd;
   return 0;
 }
+/**
+Przetwarza ciąg znaków podany przez użytkownika na numer funkcji.
+*/
 int parse_comand(char* tab){
   if(strcmp(tab, "help") == 0)
     return 0;
+  else if(strcmp(tab, "authorize") == 0)
+    return 1;
   else if(strcmp(tab, "whoami") == 0)
     return 3;
   else if(strcmp(tab, "register") == 0)
@@ -166,6 +185,7 @@ void request_details(int* cmd, int* auth){
       tmp.user_id = -1;
       printf("Ta funkcja spowodowała twoje wylogowanie!\n");
       *auth = 0;
+      printf("Ta funkcja spowodowała twoje wylogowanie!\n");
       char tab[61];
       printf("Imię i nazwisko(max. 60 zn): ");
       read_input(61,tab);
@@ -293,6 +313,7 @@ void process_respond(int* auth){
       break;
   }
 }
+/*! Kopiuje żądanie do pamięci współdzielonej. */
 void copy_request(){
   msg->user_id = my_usr_id;
   msg->command_type = tmp.command_type;

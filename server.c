@@ -8,12 +8,17 @@
 #include <string.h>
 #include <semaphore.h>
 #include "message.h"
-
+/**
+@file
+@brief Plik serwera.
+*/
+/** \cond */
 #define RESET "\033[0m"
 #define KRED  "\x1B[31m"
 #define KGRN  "\x1B[32m"
+/** \endcond */
 /**
-zaktualizować register o prześwietlanie tablicy jesli usr_count == 100;
+Struktura określająca użytkownika.
 */
 struct user{
   char name[60];
@@ -21,7 +26,7 @@ struct user{
   char properties[3][60];
   int type;
 };
-
+/** \cond */
 typedef struct message message;
 typedef struct user user;
 
@@ -32,6 +37,7 @@ sem_t *sem_request, *sem_respond, *sem_clients;
 user database[100];
 int usr_count;
 char *role[] = {"", "pacjent", "lekarz", "rejestracja"};
+/** \endcond */
 /**
 Przetwarza żądanie i umieszcza je w pamięci współdzielonej.
 */
@@ -72,7 +78,7 @@ void list();
 Obsułguje żądania niewspieranie. Wypisuje komunikat o będzie.
 */
 void unsupported();
-
+/** \cond */
 void sigint_handler(int i){
   //finalization
   munmap(s_area, sizeof(message));
@@ -156,7 +162,7 @@ int main(){
 
   return 0;
 }
-
+/* \endcond */
 void process_request(){
   if(msg->command_type < 0 || msg->command_type > 14){
     msg->command_type = -1;
