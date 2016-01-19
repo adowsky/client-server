@@ -43,6 +43,15 @@ int read_input(int count, char* dir){
     dir[strlen(dir)-1] = 0;
   }
   /**
+  * Czyści bufory używane przy komunikacji z serwerem.
+  */
+  void clear_buffer(){
+    for(int i=0;i<300;i++){
+      msg->message[i] = 0;
+      tmp.message[i] = 0;
+    }
+  }
+  /**
   * Czyści bufor wejścia.
   */
 void flushin(){
@@ -72,7 +81,8 @@ int main(){
     perror("SHM OPEN ERROR!");
     exit(-1);
   }
-  s_area = (unsigned int*) mmap(0, sizeof(message), PROT_WRITE | PROT_READ, MAP_SHARED, smd, 0 );
+  s_area = (unsigned int*) mmap(0, sizeof(message),
+      PROT_WRITE | PROT_READ, MAP_SHARED, smd, 0 );
   if(s_area == (void*)-1){
     perror("mmap error!");
     exit(-1);
@@ -104,8 +114,8 @@ int main(){
     sem_wait(sem_clients);
     csem = 1;
     if(make == 0 ){
+      //clear_buffer();
       copy_request();
-
       sem_post(sem_request);
       sem_wait(sem_respond);
       process_respond(&auth);
@@ -185,7 +195,6 @@ void request_details(int* cmd, int* auth){
       tmp.user_id = -1;
       printf("Ta funkcja spowodowała twoje wylogowanie!\n");
       *auth = 0;
-      printf("Ta funkcja spowodowała twoje wylogowanie!\n");
       char tab[61];
       printf("Imię i nazwisko(max. 60 zn): ");
       read_input(61,tab);
@@ -194,6 +203,7 @@ void request_details(int* cmd, int* auth){
       read_input(61,tab);
       strcat(tmp.message, ";");
       strcat(tmp.message, tab);
+      printf("%s\n", tmp.message);
       tmp.command_type = 1;
       break;
     case 0:
@@ -204,14 +214,12 @@ void request_details(int* cmd, int* auth){
     case 4: // rejestracja
       printf("Imię i nazwisko: ");
       char name[60];
-      char ev='\n';
       read_input(60,name);
-      strcpy(tmp.message,name);
+      strcat(tmp.message,name);
       strcat(tmp.message,";");
       char conf;
       printf("Hasło? (t\\N) ");
       read_input(1,&conf);
-      printf("%c\n",conf);
       if(conf == 't'){
       printf("Podaj hasło: ");
       read_input(60,tab);
@@ -231,7 +239,7 @@ void request_details(int* cmd, int* auth){
       if(conf == 't'){
         char rozp[100];
         printf("Podaj rozpoznanie(max 100 zn.): ");
-        read_input(100,tab);
+        read_input(100,rozp);
       strcat(tmp.message, rozp);
     }
       break;
@@ -243,7 +251,7 @@ void request_details(int* cmd, int* auth){
         printf("Imię i nazwisko: ");
         char tab[60];
         read_input(60,tab);
-        strcmp(tmp.message, tab);
+        strcat(tmp.message, tab);
         strcat(tmp.message, ";");
         printf("Hasło: ");
         read_input(60,tab);
@@ -255,7 +263,6 @@ void request_details(int* cmd, int* auth){
       break;
     case 6: //delete
       printf("Imię i nazwisko: ");
-
       read_input(60,tmp.message);
       break;
     case 7:
@@ -263,13 +270,22 @@ void request_details(int* cmd, int* auth){
       break;
     case 8: //update
       if(strcmp(user_type, "lekarz") == 0){ // wysyła lekarz
-        printf("Imię i nazwisko: ");
+        printf("Imię: ");
         char tab[100];
-        read_input(60,tmp.message);
+        read_input(25,tmp.message);
+        strcat(tmp.message, ";");
+        printf("nazwisko: ");
+        read_input(35,tab);
+        strcat(tmp.message, tab);
         strcat(tmp.message, ";");
         printf("rozpoznanie: ");
         read_input(100,tab);
         strcat(tmp.message, tab);
+        strcat(tmp.message, ";");
+        printf("Zarejestrowany: ");
+        read_input(3,tab);
+        strcat(tmp.message, tab);
+
       }else{  // wysyła rejestracja lub pacjent
         printf("Nie masz wystarczajacych uprawnień! \n");
         *cmd = -1;
@@ -296,15 +312,16 @@ void process_respond(int* auth){
     }else{
       printf("SERVER: %s \n", msg->message);
     }
+    clear_buffer();
     return;
   }
   switch (msg->command_type) {
     case -1:  // Błąd
-      printf("Problem z przetworzeniem żądania!\nSERVER: %s", msg->message);
+      printf("Problem z przetworzeniem żądania!\nSERVER: %s\n", msg->message);
       break;
     case 0:
     case 2 ... 14:
-      printf("%s",msg->message);
+      printf("SERVER: %s\n",msg->message);
       if(msg->is_complete == 0)
         printf("\n");
       break;
@@ -312,6 +329,7 @@ void process_respond(int* auth){
       printf("Wystapil problem z żądaniem lub żądanie nieobsugiwane! \n");
       break;
   }
+  clear_buffer();
 }
 /*! Kopiuje żądanie do pamięci współdzielonej. */
 void copy_request(){
