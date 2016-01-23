@@ -167,7 +167,6 @@ void request_details(int* cmd, int* auth){
       printf("Imię i nazwisko: ");
       char name[60];
       read_input(60,name);
-      strcpy(tmp.message, "pacjent;");
       strcat(tmp.message,name);
       strcat(tmp.message,";");
       char conf;
@@ -314,13 +313,12 @@ int main(){
   my_usr_id = -1;
   printf("Welcome in Hospital client!\n To get command list type 0 \n");
   int auth = 0;
-
+// main loop
   while(1){
     int make = make_request(&auth);
     sem_wait(sem_clients);
     csem = 1;
     if(make == 0 ){
-      //clear_buffer();
       copy_request();
       sem_post(sem_request);
       sem_wait(sem_respond);

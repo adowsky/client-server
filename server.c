@@ -101,6 +101,7 @@ void create_basic_users(){
   strcpy(database[usr_count].name, "lekarz\0");
   database[usr_count].type = 2;
   strcpy(database[usr_count].password, "lek\0");
+  strcpy(properties[2][usr_count], "specjalizacja: ogólny Dostępny");
   printf("%d %ddone\n",usr_count,database[usr_count].type);
   usr_count++;
 
@@ -157,6 +158,7 @@ int main(){
   //end of initialization
   printf(KGRN "OK \n" RESET);
   printf("Serwer uruchomiony pomyślnie!\n");
+  //main loop
   while(1){
     sem_wait(sem_request);
     printf("odebrano żądanie. \nPrzetwarzanie... \n");
@@ -165,7 +167,6 @@ int main(){
     sem_post(sem_respond);
     sleep(2);
   }
-
   return 0;
 }
 /* \endcond */
@@ -261,11 +262,6 @@ void registr(){
   char* dup = strdup(msg->message);
   char* delim = ";";
   char* result = strsep(&dup, delim);
-  if(strcmp(result, "pacjent") != 0){
-    strcpy(msg->message, "Można zarejestrować tylko nowego pacjenta!");
-    return;
-  }
-  result = strsep(&dup, delim);
   strcpy(database[new].name, result);
   result = strsep(&dup, delim);
   strcpy(database[new].password, result);
