@@ -7,6 +7,8 @@
 #include <signal.h>
 #include <string.h>
 #include <semaphore.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include "message.h"
 /**
 @file
@@ -259,15 +261,15 @@ void registr(){
   char* dup = strdup(msg->message);
   char* delim = ";";
   char* result = strsep(&dup, delim);
+  if(strcmp(result, "pacjent") != 0){
+    strcpy(msg->message, "Można zarejestrować tylko nowego pacjenta!");
+    return;
+  }
+  result = strsep(&dup, delim);
   strcpy(database[new].name, result);
   result = strsep(&dup, delim);
   strcpy(database[new].password, result);
-  printf("Password: %s\n",result);
-  result = strsep(&dup, delim);
-  strcpy(database[new].properties[0], result);
-  result = strsep(&dup, delim);
-  printf("%s\n",result);
-  strcpy(database[new].properties[1], result);
+  strcpy(database[new].properties[0], "");
   strcpy(database[new].properties[2], "Zarejestrowany" );
   database[new].type = 1;
   strcpy(msg->message, "Rejestracja zakończona pomyślnie!");
@@ -315,8 +317,8 @@ void details(){
   }
 }
 void delete(){
-  if(msg->user_id == 1){
-    strcpy(msg->message, "Brak uprawnień!");
+  if(database[msg->user_id].type == 1){
+    strcpy(msg->message,"Brak uprawnień!");
     return;
   }
   int i;
@@ -365,7 +367,10 @@ void update(){
     strcpy(msg->message, "Nie zaktualizowano");
 }
 void list(){
-  printf("%d\n",usr_count);
+  if(database[msg->user_id].type == 1){
+    strcpy(msg->message,"Brak uprawnień!");
+    return;
+  }
   int i;
   int field;
   if(msg->is_complete == -1){ // czy jest to kontynuacja wysyłania
@@ -379,9 +384,13 @@ void list(){
   strcpy(msg->message, "");
   int size = 0;
   for(; i<usr_count; ){
+    if(database[i].type == 0){
+      printf("Pusty\n");
+      i++;
+      continue;
+    }
     if(field == 0){
       int len = strlen(database[i].name);
-      printf("%d:%s ",i,database[i].name);
       if(size+len+1 >300){
         msg->is_complete = -1;
         tmp1 = i;
