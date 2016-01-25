@@ -311,7 +311,7 @@ int main(){
   msg = (void*) s_area;
   csem = 0;
   my_usr_id = -1;
-  printf("Welcome in Hospital client!\n To get command list type 0 \n");
+  printf("Welcome in Hospital client!\n");
   int auth = 0;
 // main loop
   while(1){

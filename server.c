@@ -101,7 +101,7 @@ void create_basic_users(){
   strcpy(database[usr_count].name, "lekarz\0");
   database[usr_count].type = 2;
   strcpy(database[usr_count].password, "lek\0");
-  strcpy(properties[2][usr_count], "specjalizacja: ogólny Dostępny");
+  strcpy(database[usr_count].properties[2], "specjalizacja: ogólny Dostępny");
   printf("%d %ddone\n",usr_count,database[usr_count].type);
   usr_count++;
 
@@ -258,6 +258,11 @@ void registr(){
   }else{
     new = usr_count;
     usr_count++;
+  }
+  if(new == -1){
+    strcpy(msg->message,"Bufor użytkowników pełny. Rejestracja nieudana.");
+    msg->command_type = -1;
+    return;
   }
   char* dup = strdup(msg->message);
   char* delim = ";";
