@@ -3,7 +3,7 @@ Struktura używana do komunikacji między klientem, a serwerem. Reprezentuje zar
 */
 struct message{
   int command_type;
-  int user_id;
+  long user_id;
   char message[300];
   int is_complete;
 };

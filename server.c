@@ -135,19 +135,19 @@ int main(){
     exit(-1);
   }
   msg = (void*)s_area;
-  sem_request = sem_open("/sem_request",
+  sem_request = sem_open("/sem-request",
     O_RDWR | O_CREAT, 0660, 0);
   if(sem_request == SEM_FAILED){
     perror("Request semafor error!");
     exit(-1);
   }
-  sem_respond = sem_open("/sem_respond",
+  sem_respond = sem_open("/sem-respond",
     O_RDWR | O_CREAT, 0660, 0);
   if(sem_respond == SEM_FAILED){
     perror("Respond semafor error!");
     exit(-1);
   }
-  sem_clients = sem_open("/sem_clients",
+  sem_clients = sem_open("/sem-clients",
     O_RDWR | O_CREAT, 0660, 1);
   if(sem_clients == SEM_FAILED){
     perror("Clients semafor error!");
@@ -215,11 +215,14 @@ int authenticate(){
   char* delim = ";";
   char* delim2 = "_";
   char* tmp = strsep(&password, delim); //password się utnie o name i zostanie pojedyńczy wpis.
-  char* name = strsep(&tmp, delim2);
+  char* n = strsep(&tmp, delim2);
+char name[100];
+strcpy(name,n);
   if(strcmp(tmp,"") != 0){
     strcat(name, " ");
     strcat(name,tmp);
   }
+printf("%s\n", name);
   int i;
   msg->user_id = -1;
   for(i=0; i<usr_count; i++){
@@ -273,12 +276,17 @@ void registr(){
   char* delim = ";";
   char* delim2 = "_";
   char* tmp = strsep(&dup, delim);
+	
   char* result = strsep(&tmp, delim2);
+	char usr[100];
+	strcpy(usr,result);
+	printf("tmp: %s r:%s\n",tmp,result);
   if(strcmp(tmp,"") != 0){
-    strcat(result, " ");
-    strcat(result, tmp);
+    strcat(usr," ");
+    strcat(usr,tmp);
   }
-  strcpy(database[new].name, result);
+printf("user: %sqqqq\n",usr);
+  strcpy(database[new].name, usr);
   result = strsep(&dup, delim);
   strcpy(database[new].password, result);
   strcpy(database[new].properties[0], "");
@@ -355,7 +363,9 @@ void update(){
   char* dup = strdup(msg->message);
   char* delim = ";";
   char* result = strsep(&dup,delim);
-  char *name = strdup(result);
+  char *n = strdup(result);
+char name[100];
+strcpy(name,n);
   result = strsep(&dup,delim);
   if(strcmp(result,"") != 0)
       strcat(name, " ");

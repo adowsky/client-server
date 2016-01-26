@@ -49,7 +49,8 @@ int read_input(int count, char* dir){
   * Czyści bufory używane przy komunikacji z serwerem.
   */
   void clear_buffer(){
-    for(int i=0;i<300;i++){
+int i;
+    for( i=0;i<300;i++){
       msg->message[i] = 0;
       tmp.message[i] = 0;
     }
@@ -118,6 +119,7 @@ int make_request(int *auth){
       strcpy(password,"");
     strcat(tmp.message, ";");
     strcat(tmp.message, password);
+	printf("%s\n",tmp.message);
     tmp.command_type = 1;
     return 0;
   }
@@ -302,17 +304,17 @@ int main(){
     perror("mmap error!");
     exit(-1);
   }
-  sem_t* sem_request = sem_open("/sem_request", O_RDWR);
+  sem_t* sem_request = sem_open("/sem-request", O_RDWR);
   if(sem_request == SEM_FAILED){
     perror("Request semafor error!");
     exit(-1);
   }
-  sem_t* sem_respond = sem_open("/sem_respond", O_RDWR);
+  sem_t* sem_respond = sem_open("/sem-respond", O_RDWR);
   if(sem_respond == SEM_FAILED){
     perror("Respond semafor error!");
     exit(-1);
   }
-  sem_clients = sem_open("/sem_clients", O_RDWR);
+  sem_clients = sem_open("/sem-clients", O_RDWR);
   if(sem_clients == SEM_FAILED){
     perror("Clients semafor error!");
     exit(-1);
@@ -330,6 +332,7 @@ int main(){
     csem = 1;
     if(make == 0 ){
       copy_request();
+	printf("%s\n",msg->message);
       sem_post(sem_request);
       sem_wait(sem_respond);
       process_respond(&auth);
