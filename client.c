@@ -105,14 +105,17 @@ int parse_comand(char* tab){
 int make_request(int *auth){
   if(!*auth){  // autoryzuje do skutku
     char name[60], password[30];
-    printf("Imię i nazwisko: ");
-    char c;
-    read_input(60, name);
+    printf("Imię: ");
+    read_input(61,name);
+    strcpy(tmp.message, name);
+    strcat(tmp.message,"_");
+    printf("Nazwisko: ");
+    read_input(60,name);
+    strcat(tmp.message,name);
     printf("Hasło(jeśli puste wpisz \"\")[max. 30 zn]: ");
     read_input(30, password);
     if(strcmp(password,"\"\"") == 0)
       strcpy(password,"");
-    strcpy(tmp.message, name);
     strcat(tmp.message, ";");
     strcat(tmp.message, password);
     tmp.command_type = 1;
@@ -143,9 +146,13 @@ void request_details(int* cmd, int* auth){
       printf("Ta funkcja spowodowała twoje wylogowanie!\n");
       *auth = 0;
       char tab[61];
-      printf("Imię i nazwisko(max. 60 zn): ");
+      printf("Imię: ");
       read_input(61,tab);
       strcpy(tmp.message, tab);
+      strcat(tmp.message,"_");
+      printf("Nazwisko: ");
+      read_input(60,tab);
+      strcat(tmp.message,tab);
       printf("Hasło(max. 60 zn): ");
       read_input(61,tab);
       strcat(tmp.message, ";");
@@ -164,19 +171,22 @@ void request_details(int* cmd, int* auth){
       *cmd = -1;
       break;
     }
-      printf("Imię i nazwisko: ");
+      printf("Imię: ");
       char name[60];
+      read_input(60,name);
+      strcpy(tmp.message,name);
+      strcat(tmp.message,"_");
+      printf("Nazwisko: ");
       read_input(60,name);
       strcat(tmp.message,name);
       strcat(tmp.message,";");
-      char conf;
-      printf("Hasło? (t\\N) ");
-      read_input(1,&conf);
-      if(conf == 't'){
       printf("Podaj hasło: ");
-      read_input(60,tab);
-      strcat(tmp.message,tab);
-      }
+      read_input(60,name);
+      strcat(tmp.message,name);
+      strcat(tmp.message,";");
+      printf("Wiek: ");
+      read_input(60,name);
+      strcat(tmp.message,name);
       break;
     case 5: // details
       if(strcmp(user_type, "lekarz") == 0){ // wysyła lekarz

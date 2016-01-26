@@ -213,8 +213,13 @@ void commands(){
 int authenticate(){
   char* password = strdup(msg->message);
   char* delim = ";";
-  char* name = strsep(&password, delim); //password się utnie o name i zostanie pojedyńczy wpis.
-  printf("Nazwa: %s\n Hasło: %s\n",name, password);
+  char* delim2 = "_";
+  char* tmp = strsep(&password, delim); //password się utnie o name i zostanie pojedyńczy wpis.
+  char* name = strsep(&tmp, delim2);
+  if(strcmp(tmp,"") != 0){
+    strcat(name, " ");
+    strcat(name,tmp);
+  }
   int i;
   msg->user_id = -1;
   for(i=0; i<usr_count; i++){
@@ -266,7 +271,13 @@ void registr(){
   }
   char* dup = strdup(msg->message);
   char* delim = ";";
-  char* result = strsep(&dup, delim);
+  char* delim2 = "_";
+  char* tmp = strsep(&dup, delim);
+  char* result = strsep(&tmp, delim2);
+  if(strcmp(tmp,"") != 0){
+    strcat(result, " ");
+    strcat(result, tmp);
+  }
   strcpy(database[new].name, result);
   result = strsep(&dup, delim);
   strcpy(database[new].password, result);
